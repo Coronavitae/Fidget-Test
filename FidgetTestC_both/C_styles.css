@@ -1,0 +1,539 @@
+body {
+    background-color: #121212;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    color: #f0f0f0;
+}
+
+.meeting-app {
+    width: 90%;
+    max-width: 1200px;
+    height: 90%;
+    background-color: #212121;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+/* --- Header (Top Bar) --- */
+.app-header {
+    background-color: #2c2c2c;
+    padding: 8px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9em;
+    border-bottom: 1px solid #333;
+}
+
+.app-title {
+    color: #b0b0b0;
+}
+
+.app-controls {
+    display: flex;
+    align-items: center;
+}
+
+.app-controls span {
+    color: #8ab4f8; /* Blue link */
+    margin-right: 15px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.view-btn {
+    background: none;
+    border: 1px solid #666;
+    color: #f0f0f0;
+    padding: 3px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+}
+
+/* --- Main Content Area (Now a flex row) --- */
+.app-main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: row; /* Changed from column to row */
+    position: relative;
+    overflow: hidden; /* Prevent content spill */
+}
+
+/* --- Video Container --- */
+.video-container {
+    flex-grow: 1; /* Take up remaining space */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #1a1a1a; /* Darker background for focus */
+    padding: 20px;
+    overflow: hidden;
+    position: relative; /* Added for A/B feature positioning */
+}
+
+.video-container video {
+    width: 100%;    /* CHANGED: Was max-width */
+    height: 100%;   /* CHANGED: Was max-height */
+    border-radius: 8px; /* Match app style */
+    object-fit: cover; /* Ensure video covers the entire container, will crop if aspect ratios don't match */
+}
+
+/* NEW: Wrapper for video and its controls */
+/* This ensures the video and footer stack vertically and take up the left-hand column's width */
+.video-and-controls-wrapper {
+    flex-grow: 1; /* Takes up the same space the video container used to */
+    display: flex;
+    flex-direction: column; /* Stacks the video and footer */
+    height: 100%;
+}
+
+/* --- New Right Sidebar --- */
+.right-sidebar {
+    width: 280px; /* Fixed width for the sidebar */
+    flex-shrink: 0; /* Prevent sidebar from shrinking */
+    background-color: #2c2c2c; /* Match header/footer */
+    border-left: 1px solid #333;
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Fill the main area's height */
+}
+
+.sidebar-section {
+    padding: 15px;
+    box-sizing: border-box; /* Include padding in height calculation */
+}
+
+.sidebar-section h3 {
+    color: #f0f0f0;
+    font-size: 1.1em;
+    margin-top: 0;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #444;
+    padding-bottom: 10px;
+}
+
+/* Top section (Participants) */
+.participants-list {
+    flex-basis: 50%; /* Occupy top 50% */
+    height: 50%; /* Explicit height */
+    border-bottom: 1px solid #333; /* Divider */
+    overflow-y: auto; /* Allow scrolling if list is long */
+}
+
+.participants-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.participants-list li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    color: #b0b0b0;
+    font-size: 0.9em;
+}
+
+.participants-list li i {
+    width: 24px; /* Give icon space */
+    text-align: center;
+    color: #8ab4f8; /* Blue icon */
+    margin-right: 10px;
+}
+
+.participants-list li .participant-status {
+    color: #888;
+    font-style: italic;
+    margin-left: auto; /* Push to the right */
+    font-size: 0.9em;
+    padding-left: 10px; /* Ensure space from name */
+}
+
+/* Bottom section (Feature Demo) */
+.feature-demo {
+    flex-basis: 50%; /* Occupy bottom 50% */
+    height: 50%; /* Explicit height */
+    overflow-y: auto; /* Allow scrolling if content is long */
+    position: relative; /* Added for A/B feature positioning */
+    padding: 15px; /* Ensure padding is applied */
+    box-sizing: border-box; /* Include padding in height */
+}
+
+.feature-demo p {
+    color: #b0b0b0;
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+
+/* --- NEW FEATURE STYLES --- */
+
+.feature-phrase {
+    position: absolute;
+    background-color: rgba(60, 60, 60, 0.9); /* Grey background */
+    color: #f0f0f0;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 0.8em;
+    font-weight: 500;
+    z-index: 10;
+    
+    /* Fade transition */
+    opacity: 0;
+    /* Default transition is for fade-in */
+    transition: opacity 0.2s ease; 
+}
+
+/* Fade-in state */
+.feature-phrase.show {
+    opacity: 1;
+}
+
+/* Correct/Incorrect States - Color change is immediate */
+.feature-phrase.correct {
+    background-color: #388e3c; /* Green */
+    transition: none; /* Ensure color change is instant */
+}
+
+.feature-phrase.incorrect {
+    background-color: #e53935; /* Red */
+    transition: none; /* Ensure color change is instant */
+}
+
+/* New class to handle the 1-second fade-out */
+.feature-phrase.fading-out {
+    opacity: 0;
+    transition: opacity 1s ease; /* 1-second fade */
+}
+
+
+/* Positioning */
+.feature-phrase[data-position="top"] {
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%); /* Only horizontal centering */
+}
+
+.feature-phrase[data-position="bottom"] {
+    bottom: 20px;
+    top: auto; /* Override default */
+    left: 50%;
+    transform: translateX(-50%); /* Only horizontal centering */
+}
+
+.feature-phrase[data-position="left"] {
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%); /* Only vertical centering */
+}
+
+.feature-phrase[data-position="right"] {
+    right: 20px;
+    left: auto; /* Override default */
+    top: 50%;
+    transform: translateY(-50%); /* Only vertical centering */
+}
+
+
+/* --- Footer (Bottom Bar) --- */
+.app-footer {
+    background-color: #2c2c2c;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #333;
+    z-index: 5; /* Do not add width: 100% */
+}
+
+.footer-left {
+    display: flex;
+    align-items: center;
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    color: #f0f0f0;
+    font-size: 0.9em;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* NEW: Styling for the status icon */
+.status-icon {
+    font-size: 1.2em; /* Makes the icon visible and sized similarly to the menu buttons */
+    margin-right: 5px;
+    line-height: 1; /* Helps with vertical alignment next to the "You" text */
+}
+
+/* NEW: Apply the red color to the icon */
+.status-icon.red-status {
+    color: #e53935; /* Sets the red color */
+}
+
+.footer-center {
+    display: flex;
+    gap: 15px;
+}
+
+.footer-btn {
+    background: none;
+    border: none;
+    color: #404040;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.7em;
+    cursor: default; /* CHANGED: Replaced 'pointer' with 'default' */
+    padding: 5px;
+    border-radius: 4px;
+    /* REMOVED: transition: background-color 0.2s; */
+    /* REMOVED: The hover state (background change) is now gone. */
+}
+
+.footer-btn i {
+    font-size: 1.2em;
+    margin-bottom: 3px;
+    color: #404040;
+}
+
+/* Ensure no visual feedback on interaction */
+.footer-btn:hover,
+.footer-btn[disabled]:hover,
+.footer-btn:active,
+.footer-btn[disabled]:active {
+    background-color: transparent !important;
+}
+
+.share-icon {
+    color: #388e3c; /* Green color for share */
+}
+
+.end-btn {
+    background-color: #404040;
+    color: #2C2C2C;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.end-btn:hover {
+    background-color: #cc2a24;
+}
+
+/* --- Settings Button in Feature Header --- */
+.feature-demo-header {
+    /* To align the h3 and the button next to each other */
+    display: flex;
+    justify-content: space-between; /* Pushes the button to the far right */
+    align-items: center; /* Vertically centers the heading and button */
+    width: 100%; 
+    margin-bottom: 10px; /* Space between the header and the paragraph below it */
+}
+
+/* Ensure the heading doesn't shrink */
+.feature-demo-header h3 {
+    margin: 0; /* Remove default h3 margins to fit cleanly */
+    /* NEW: Remove the thin grey line */
+    border-bottom: none; 
+}
+
+.settings-btn {
+    /* Override footer-btn styles for a simple icon */
+    padding: 5px; /* Small padding for a clickable area */
+    flex-direction: row; /* Overrides the 'column' direction in .footer-btn */
+    font-size: 1em; /* Control icon size */
+    color: #404040; 
+    cursor: pointer; 
+    
+    /* Remove the default gray background from the general button style */
+    background-color: transparent; 
+}
+
+/* Ensure the icon color and hover state are clean */
+.settings-btn i {
+    color: #404040; /* Match text color */
+    margin-bottom: 0; /* Remove footer button margin for the icon */
+}
+
+.settings-btn:hover {
+    background-color: #3a3a3a; /* Darken slightly on hover for feedback */
+	border-radius: 4px; /* Ensure rounded corners */
+}
+
+.settings-btn:hover i {
+    /* Change the icon color to the main foreground color (light gray/white) on hover */
+    color: #b0b0b0; 
+}
+
+/* --- Settings Modal Styles --- */
+
+/* Modal Backdrop */
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Dark semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it's on top of everything */
+}
+
+.modal-overlay.hidden {
+    display: none;
+}
+
+/* Modal Box */
+.modal-content {
+    background-color: #2c2c2c;
+    border-radius: 8px;
+    width: 350px; /* Defines the small size */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.8);
+    color: #f0f0f0;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #3a3a3a;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.1em;
+}
+
+.modal-body {
+    padding: 15px;
+}
+
+.settings-section h4 {
+    color: #8ab4f8; /* Match person icon color */
+    font-size: 0.95em;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.modal-body p {
+    font-size: 0.85em; /* Small text for instructions */
+    color: #b0b0b0;
+    margin-bottom: 15px;
+}
+
+/* --- Custom Toggle Switch (Segmented Control Style) --- */
+
+.settings-toggle-group {
+    /* Use flex to center the segmented control horizontally */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 15px;
+}
+
+/* The main container for the new segmented control */
+.segmented-control {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 38px;
+    width: 250px; /* Define a fixed width */
+    background-color: #333; /* Dark background for the control track */
+    border-radius: 20px;
+    padding: 3px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* Hide the default radio buttons */
+.segmented-control input[type="radio"] {
+    display: none;
+}
+
+/* Style for the option labels ("Big Screen" and "Side Bar") */
+.segmented-control-option {
+    flex: 1; /* Makes each option take exactly 50% of the width */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    z-index: 2; /* Keep labels above the slider */
+    cursor: pointer;
+    font-size: 0.85em;
+    font-weight: 500;
+    color: #b0b0b0; /* Default (unselected) text color */
+    transition: color 0.3s ease;
+}
+
+/* The sliding indicator pill */
+.segmented-control-slider {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    height: calc(100% - 6px); /* 100% of 38px minus 3px top and 3px bottom padding */
+    width: calc(50% - 3px); /* 50% of 250px minus the 3px left padding */
+    background-color: #5a5a5a; 
+    border-radius: 18px; 
+    z-index: 1; 
+    transition: transform 0.3s ease;
+}
+
+/* --- Interaction Styles (Moving the Slider) --- */
+
+/* When the "Big Screen" radio button is checked (Left position) */
+#big-screen:checked ~ .segmented-control-slider {
+    transform: translateX(0); /* Stays on the left */
+}
+
+/* When the "Side Bar" radio button is checked (Right position) */
+#side-bar:checked ~ .segmented-control-slider {
+	transform: translateX(calc(100% + 3px)); 
+    /* The 3px compensates for the extra space due to the parent's padding */
+}
+
+/* --- Interaction Styles (Highlighting Text) --- */
+
+/* Change the label color to white when its associated radio button is checked */
+#big-screen:checked + .segmented-control-option,
+#side-bar:checked + .segmented-control-option {
+    color: #f0f0f0; /* Highlight text color */
+}
+
+/* Set the 'Side Bar' label to white when the 'Big Screen' radio is checked */
+#big-screen:checked ~ label[for="side-bar"] {
+    color: #f0f0f0;
+}
+
+/* Removed all CSS related to:
+    - .settings-modal
+    - .modal-header
+    - .close-buttons, .close-btn
+    - .modal-content
+    - .sidebar (the old settings one)
+    - .search-box
+    - .settings-nav, .nav-item
+    - .main-settings
+    - .setting-item, .setting-group, .setting-select
+    - .dim-video-label
+    - .switch, .slider
+    - .caption-color-options, .color-box
+    - .position-preview
+    - .main-content-image
+*/
+

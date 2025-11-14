@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alex Hana: UX Prototype</title>
+    <link rel="stylesheet" href="C_styles.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="meeting-app">
+        <header class="app-header">
+            <div class="app-title">Alex's UX Prototype</div>
+            <div class="app-controls">
+                <span></span>
+                <button class="view-btn">Zoom</button>
+            </div>
+        </header>
+
+        <!-- Main content now holds the video and the new sidebar -->
+        <main class="app-main">
+            
+    <div class="video-and-controls-wrapper">
+        
+        <div class="video-container" id="video-container-area">
+            <video id="main-video" src="lecture_example.mov" width="854" height="480" controls autoplay muted loop playsinline
+                onerror="handleVideoError(this)">
+                Your browser does not support the video tag.
+            </video>
+            <div id="video-error-msg" style="display: none; color: #ff5f56; text-align: center;">
+                <p><strong>Error loading video.</strong></p>
+                <p style="font-size: 0.8em; color: #aaa;">Please ensure "lecture_example.mp4" is in the same folder as this file.</p>
+            </div>
+        </div>
+
+        <footer class="app-footer">
+            <div class="footer-left">
+                <div class="profile">
+                <i class="fas fa-microphone-slash status-icon red-status"></i>
+    		    <span>You</span>
+                </div>
+            </div>
+            <div class="footer-center">
+                <button class="footer-btn" disabled><i class="fas fa-microphone-slash"></i> Audio</button>
+                <button class="footer-btn" disabled><i class="fas fa-video-slash"></i> Video</button>
+                <button class="footer-btn" disabled><i class="fas fa-users"></i> Participants</button>
+                <button class="footer-btn" disabled><i class="fas fa-comment-alt"></i> Chat</button>
+                <button class="footer-btn" disabled><i class="fas fa-info-circle"></i> Meeting Info</button>
+                <button class="footer-btn footer-more-btn" disabled><i class="fas fa-ellipsis-h"></i> More</button>
+            </div>
+            <div class="footer-right">
+                <button class="end-btn">End</button>
+            </div>
+        </footer>
+    </div>
+    <aside class="right-sidebar">
+        <div class="sidebar-section participants-list">
+            <h3>Participants (5)</h3>
+            <ul>
+                <li>
+                    <i class="fas fa-user-tie"></i> 
+                    <span>Dr. Eva Rostova</span> 
+                    <span class="participant-status">(Presenter)</span>
+                </li>
+                <li>
+                    <i class="fas fa-user"></i> 
+                    <span>You</span> 
+                </li>
+                <li>
+                    <i class="fas fa-user"></i> 
+                    <span>David Chen</span>
+                </li>
+                <li>
+                    <i class="fas fa-user"></i> 
+                    <span>Maria Garcia</span>
+                </li>
+                <li>
+                    <i class="fas fa-user"></i> 
+                    <span>David Lee</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section feature-demo" id="feature-demo-area">
+            <div class="feature-demo-header">
+                <h3>Fidget Widget</h3>
+                <button id="open-settings-btn" class="footer-btn settings-btn" aria-label="Settings">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+	<p>Click the gear for more information</p>
+        </div>
+    </aside>
+
+</main>
+
+<div id="settings-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Fidget Widget Settings</h3>
+                <button id="close-modal-btn" class="footer-btn settings-btn" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h4>Instructions</h4>
+                    <p>When a word appears, use the keyboard arrows or AWSD keys to match the direction.</p>
+                </div>
+
+                <div class="settings-section">
+                    <h4>On-screen Location</h4>
+                    <p>Choose where to play with your virtual fidget widget: on the presentation screen or in this side bar. </p>
+                </div>
+
+                <div class="settings-toggle-group">
+    <div class="segmented-control">
+        <input type="radio" name="location" id="big-screen" checked>
+        <input type="radio" name="location" id="side-bar">
+        
+        <label for="big-screen" class="segmented-control-option">Big Screen</label>
+        <label for="side-bar" class="segmented-control-option">Side Bar</label>
+        
+        <div class="segmented-control-slider"></div>
+    </div>
+</div>
+                
+            </div>
+        </div>
+    </div>
+
+    </div>
+       
+    </div>
+
+<script>
+    // Optional: Add a simple error handler for the video
+    function handleVideoError(videoElement) {
+        console.error("Error loading video:", videoElement.src);
+        // Hide the video element
+        videoElement.style.display = 'none';
+        // Show the custom error message
+        const errorMsg = document.getElementById('video-error-msg');
+        if (errorMsg) {
+            errorMsg.style.display = 'block';
+        }
+    }
+
+    // --- NEW FEATURE SCRIPT ---
+    document.addEventListener('DOMContentLoaded', () => {
+
+	// NEW: Modal functionality
+const settingsButton = document.getElementById('open-settings-btn'); // Targets the gear icon
+const modal = document.getElementById('settings-modal');
+const closeModalButton = document.getElementById('close-modal-btn');
+
+// 1. Get the radio buttons for the toggle slider
+const bigScreenRadio = document.getElementById('big-screen');
+const sideBarRadio = document.getElementById('side-bar');
+
+// 2. Open Modal (Gear Icon)
+if (settingsButton) {
+    settingsButton.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+    });
+}
+
+// 3. Close Modal (X button)
+if (closeModalButton) {
+    closeModalButton.addEventListener('click', () => {
+        modal.classList.add('hidden');
+    });
+}
+
+// 4. Close Modal when clicking the dark background (overlay)
+if (modal) {
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.add('hidden');
+        }
+    });
+}
+
+// --- FEATURE CONTAINER LOGIC ---
+const video = document.getElementById('main-video');
+const featureDemoArea = document.getElementById('feature-demo-area');
+const videoContainer = document.getElementById('video-container-area');
+
+let featureContainer; 
+let activePhrase = null; // Must be declared here for the update function to access
+
+// Function to determine the currently active container
+function getActiveContainer() {
+    // 'big-screen' is checked by default in the HTML
+    if (bigScreenRadio.checked) {
+        return videoContainer;
+    } else {
+        return featureDemoArea;
+    }
+}
+
+// Function to change the container when the setting is toggled
+function updateFeatureContainer() {
+    featureContainer = getActiveContainer();
+    
+    // Check if a phrase is currently active and move it
+    if (activePhrase && activePhrase.element) {
+        // Remove the element from its current parent and move it
+        if (activePhrase.element.parentElement) {
+            activePhrase.element.parentElement.removeChild(activePhrase.element);
+        }
+        featureContainer.appendChild(activePhrase.element);
+    }
+
+    // For the sidebar, manage the default instruction text visibility
+    const infoP = featureDemoArea.querySelector('p');
+    if (infoP && infoP.textContent.includes('Click the gear')) {
+        if (featureContainer === featureDemoArea) {
+            // Hide the instruction when words are active in the sidebar
+            infoP.style.display = 'none';
+        } else {
+            // Show the instruction when words are NOT active in the sidebar
+            infoP.style.display = 'block';
+        }
+    }
+}
+
+// 1. INITIALIZE: Set the initial featureContainer based on the default checked state ("Big Screen")
+updateFeatureContainer();
+
+// 2. ADD LISTENERS: Listen for changes on the radio buttons
+bigScreenRadio.addEventListener('change', updateFeatureContainer);
+sideBarRadio.addEventListener('change', updateFeatureContainer);
+
+        let phrasesData = [];
+        let activePhrase = null; // Holds info about the currently displayed phrase
+        let phraseTimeout = null; // Holds the timeout for an incorrect answer
+
+        // 1. Load Phrases from JSON
+        async function loadPhrases() {
+            try {
+                const response = await fetch('phrases.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                // Add a 'shown' flag to each phrase
+                phrasesData = data.map(phrase => ({ ...phrase, shown: false }));
+                console.log('Phrases loaded:', phrasesData);
+            } catch (error) {
+                console.error("Could not load phrases.json:", error);
+                if (featureContainer.id === 'feature-demo-area') {
+                     featureContainer.innerHTML += '<p style="color: #ff5f56;">Error: Could not load phrases.json</p>';
+                }
+            }
+        }
+
+        // 2. Listen to Video Time
+        video.addEventListener('timeupdate', () => {
+            if (!phrasesData.length || activePhrase) return; // Don't run if data isn't loaded or a phrase is active
+
+            const currentTime = video.currentTime;
+
+            for (const phrase of phrasesData) {
+                // Check if time is right and phrase hasn't been shown
+                if (currentTime >= phrase.time && !phrase.shown) {
+                    phrase.shown = true; // Mark as shown
+                    displayPhrase(phrase);
+                    break; // Show only one phrase at a time
+                }
+            }
+        });
+
+        // 3. Display the Phrase
+        function displayPhrase(phrase) {
+            if (activePhrase) return; // Safety check
+
+            const positions = ['top', 'bottom', 'left', 'right'];
+            const randomPosition = positions[Math.floor(Math.random() * positions.length)];
+
+            const phraseEl = document.createElement('div');
+            phraseEl.className = 'feature-phrase';
+            phraseEl.dataset.position = randomPosition;
+            phraseEl.textContent = phrase.text;
+
+    // *** IMPORTANT: Ensure this block is included and correctly formatted ***
+    if (featureContainer === featureDemoArea) {
+        const infoP = featureDemoArea.querySelector('p');
+        if (infoP && infoP.textContent.includes('Click the gear')) {
+            infoP.style.display = 'none';
+        }
+    }
+    // **********************************************************************
+
+    featureContainer.appendChild(phraseEl); 
+	
+	// Append the word element to the chosen container// Store active phrase info//
+
+            // Store active phrase info
+            activePhrase = {
+                element: phraseEl,
+                position: randomPosition,
+            };
+
+            // Force reflow to enable CSS transition
+            void phraseEl.offsetWidth; 
+
+            // Add 'show' class to trigger fade-in
+            phraseEl.classList.add('show');
+
+            // Start a timeout. If user doesn't answer, it's incorrect.
+            phraseTimeout = setTimeout(() => {
+                resolvePhrase(false); // 'false' means incorrect
+            }, 3000); // 3-second window to answer
+        }
+
+        // 4. Listen for Keyboard Input
+        document.addEventListener('keydown', (e) => {
+            if (!activePhrase) return; // Only listen if a phrase is active
+
+            let pressedDirection = null;
+
+            switch (e.key.toLowerCase()) {
+                case 'arrowup':
+                case 'w':
+                    pressedDirection = 'top';
+                    break;
+                case 'arrowdown':
+                case 's':
+                    pressedDirection = 'bottom';
+                    break;
+                case 'arrowleft':
+                case 'a':
+                    pressedDirection = 'left';
+                    break;
+                case 'arrowright':
+                case 'd':
+                    pressedDirection = 'right';
+                    break;
+                default:
+                    return; // Ignore other keys
+            }
+            
+            e.preventDefault(); // Stop scrolling, etc.
+
+            // Check if correct
+            const isCorrect = (pressedDirection === activePhrase.position);
+            resolvePhrase(isCorrect);
+        });
+
+        // 5. Resolve Phrase (Correct/Incorrect)
+        function resolvePhrase(isCorrect) {
+            if (!activePhrase) return; // Already resolved
+
+            // Clear the auto-fail timeout
+            clearTimeout(phraseTimeout);
+            phraseTimeout = null;
+
+            const phraseEl = activePhrase.element;
+            
+            // Prevent this phrase from being triggered again
+            activePhrase = null; 
+
+            if (isCorrect) {
+                phraseEl.classList.add('correct');
+                // Color change is immediate (from CSS)
+            } else {
+                phraseEl.classList.add('incorrect');
+                // Color change is immediate (from CSS)
+            }
+
+            // Wait a tiny moment (50ms) for the color to apply, then start the fade
+            setTimeout(() => {
+                phraseEl.classList.add('fading-out'); // Add class to trigger 1s fade
+                phraseEl.classList.remove('show'); // Remove show class
+            }, 50); // Small delay to ensure color change renders first
+
+            // 6. Cleanup after fade (1s fade + 50ms delay)
+            setTimeout(() => {
+                if (phraseEl.parentElement) {
+                    phraseEl.parentElement.removeChild(phraseEl);
+                }
+            }, 1050); 
+
+            // Reset state (MOVED to prevent re-triggering)
+            // activePhrase = null;
+        }
+
+        // Start by loading the data
+        loadPhrases();
+
+        // Bonus: Reset 'shown' flags if video loops
+        video.addEventListener('seeking', () => {
+             // If seeking back to the start
+            if(video.currentTime < 2) {
+                phrasesData.forEach(p => p.shown = false);
+                console.log('Video reset, phrases re-enabled.');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
